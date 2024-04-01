@@ -531,6 +531,29 @@ namespace VeraCrypt
 
 	}
 
+    void SecurityToken::Decrypt(CK_OBJECT_HANDLE publicKey, CK_BYTE_PTR data, CK_ULONG dataLen)
+    {
+        CK_RV status;
+        CK_SESSION_HANDLE session = Sessions[0].Handle;
+        CK_BYTE encryptedData[512];
+
+        CK_ULONG encryptedDataLen = sizeof(encryptedData);
+
+        CK_RSA_PKCS_OAEP_PARAMS oaepParams = {CKM_SHA_1, CKG_MGF1_SHA1, CKZ_DATA_SPECIFIED, NULL_PTR, 0};
+
+        CK_MECHANISM mechanism = {CKM_RSA_PKCS_OAEP, &oaepParams, sizeof(oaepParams)};
+
+        status = Pkcs11Functions->C_DecryptInit(session,&mechanism,publicKey);
+        status = Pkcs11Functions->C_Decrypt(session, data, dataLen, encryptedData, &encryptedDataLen);
+
+        if (status != CKR_OK)
+            throw Pkcs11Exception(status);
+        else {
+            std::cout << "Data successfully encrypted : " << encryptedData << std::endl;
+        }
+
+    }
+
 	SecurityCertificateInfo const SecurityToken::GetCertificateInfo(CK_SLOT_ID slotId, CK_OBJECT_HANDLE object, CK_ATTRIBUTE_TYPE attributeType){
         
         SecurityCertificateInfo certificate;
