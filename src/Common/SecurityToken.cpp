@@ -551,7 +551,7 @@ namespace VeraCrypt
         if (status != CKR_OK)
             throw Pkcs11Exception(status);
         else {
-            std::cout << "Data successfully encrypted : " << decryptedData << std::endl;
+            std::cout << "Data successfully decrypted : " << decryptedData << std::endl;
         }
 
 		return decryptedData;
