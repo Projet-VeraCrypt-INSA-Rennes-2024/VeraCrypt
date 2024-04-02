@@ -465,10 +465,10 @@ namespace VeraCrypt
 
 	}*/
 
-	CK_OBJECT_HANDLE SecurityToken::GetCertificate()
+	vector<CK_OBJECT_HANDLE> SecurityToken::GetKeyFromPkcs11(CK_OBJECT_CLASS oc)
 	{
 
-		CK_OBJECT_HANDLE rep = nullptr;
+		vector <CK_OBJECT_HANDLE> rep;
 
 		foreach(const CK_SLOT_ID & slotId, GetTokenSlots())
 		{
@@ -493,14 +493,14 @@ namespace VeraCrypt
 				throw;
 			}
 
-			foreach(const CK_OBJECT_HANDLE & dataHandle, GetObjects(slotId, CKO_CERTIFICATE)){
+			foreach(const CK_OBJECT_HANDLE & dataHandle, GetObjects(slotId, oc)){
 				vector <byte> label;
 				GetObjectAttribute(slotId, dataHandle, CKA_LABEL, label);
 				std::cout << "ck :" << std::endl;
 				for(byte b: label){
 					std::cout << b;
 				}
-				rep = dataHandle;
+				rep.push_back(dataHandle);
 				std::cout << std::endl;
 			}
 		}
@@ -508,7 +508,7 @@ namespace VeraCrypt
 		return rep;
 	}
 
-	void SecurityToken::Encrypt(CK_OBJECT_HANDLE publicKey, CK_BYTE_PTR data, CK_ULONG dataLen)
+	CK_BYTE_PTR SecurityToken::Encrypt(CK_OBJECT_HANDLE publicKey, CK_BYTE_PTR data, CK_ULONG dataLen)
 	{
 		CK_RV status;
 		CK_SESSION_HANDLE session = Sessions[0].Handle;
@@ -528,6 +528,8 @@ namespace VeraCrypt
 		else {
 			std::cout << "Data successfully encrypted : " << encryptedData << std::endl;
 		}
+
+		return encryptedData;
 
 	}
 
