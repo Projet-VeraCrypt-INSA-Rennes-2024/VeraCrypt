@@ -14,6 +14,7 @@
 #include "Main/GraphicUserInterface.h"
 #include "NewSecurityTokenKeyfileDialog.h"
 #include "SecurityTokenKeyfilesDialog.h"
+#include "PKCS11/pkcs11t.h"
 
 namespace VeraCrypt
 {
@@ -32,11 +33,18 @@ namespace VeraCrypt
 		SecurityTokenKeyfileListCtrl->InsertColumn (ColumnSecurityTokenKeyfileLabel, LangString["TOKEN_DATA_OBJECT_LABEL"], wxLIST_FORMAT_LEFT, 1);
 		colPermilles.push_back (529);
 
+        //TODO: i18n
+        SecurityTokenCertificateListCtrl->InsertColumn(ColumnSecurityTokenCertificate, "Certificat", wxLIST_FORMAT_LEFT, 1);
+
 		FillSecurityTokenKeyfileListCtrl();
+        FillSecurityTokenCertificateListCtrl(); 
 
 		Gui->SetListCtrlWidth (SecurityTokenKeyfileListCtrl, 65);
 		Gui->SetListCtrlHeight (SecurityTokenKeyfileListCtrl, 16);
 		Gui->SetListCtrlColumnWidths (SecurityTokenKeyfileListCtrl, colPermilles);
+
+        //TODO: ajuster la taille en fonction du plus grand label existant dans la liste
+        SecurityTokenCertificateListCtrl->SetColumnWidth(ColumnSecurityTokenCertificate, 500);
 
 		Fit();
 		Layout();
@@ -66,6 +74,26 @@ namespace VeraCrypt
 			Gui->AppendToListCtrl (SecurityTokenKeyfileListCtrl, fields, 0, key.get());
 		}
 	}
+
+    void SecurityTokenKeyfilesDialog::FillSecurityTokenCertificateListCtrl ()
+    {
+        //TODO: meilleur code que ça
+        CK_SESSION_HANDLE session = Sessions[0].Handle;
+
+        SecurityTokenCertificateListCtrl->DeleteAllItems();
+        //TODO: faire la distinction entre privé et public
+        SecurityTokenCertificateList = SecurityToken::GetKeyFromPkcs11(CKO_PRIVATE_KEY);
+
+        foreach(const CK_OBJECT_HANDLE handle, SecurityTokenCertificateList)
+        {
+            //TODO: gestion de la session
+            vector<byte> labelAsBytes;
+            SecurityToken::GetObjectAttribute(session, handle, CKA_LABEL, labelAsBytes);
+            string labelAsText = string(reinterpret_cast<const char*>(attributeValue), attributeValue.size());
+
+            SecurityTokenCertificateListCtrl->InsertItem(0, labelAsText);
+        }
+    }
 
 	void SecurityTokenKeyfilesDialog::OnDeleteButtonClick (wxCommandEvent& event)
 	{

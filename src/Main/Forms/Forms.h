@@ -696,6 +696,7 @@ namespace VeraCrypt
 
 		protected:
 			wxListCtrl* SecurityTokenKeyfileListCtrl;
+            wxListCtrl* SecurityTokenCertificateListCtrl;
 			wxButton* ExportButton;
 			wxButton* DeleteButton;
 			wxButton* ImportButton;

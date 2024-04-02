@@ -35,7 +35,13 @@ namespace VeraCrypt
 			ColumnSecurityTokenKeyfileLabel,
 		};
 
+        enum
+        {
+            ColumnSecurityTokenCertificate = 0
+        };
+
 		void FillSecurityTokenKeyfileListCtrl ();
+        void FillSecurityTokenCertificateListCtrl ();
 		void OnDeleteButtonClick (wxCommandEvent& event);
 		void OnExportButtonClick (wxCommandEvent& event);
 		void OnImportButtonClick (wxCommandEvent& event);

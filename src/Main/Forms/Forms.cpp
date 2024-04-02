@@ -2524,6 +2524,9 @@ SecurityTokenKeyfilesDialogBase::SecurityTokenKeyfilesDialogBase( wxWindow* pare
 	SecurityTokenKeyfileListCtrl = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_VRULES|wxBORDER_SUNKEN );
 	bSizer142->Add( SecurityTokenKeyfileListCtrl, 1, wxALL|wxEXPAND, 5 );
 
+    SecurityTokenCertificateListCtrl = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_VRULES|wxBORDER_SUNKEN);
+    bSizer142->Add(SecurityTokenCertificateListCtrl, 1, wxALL|wxEXPAND, 5);
+
 	wxBoxSizer* bSizer141;
 	bSizer141 = new wxBoxSizer( wxHORIZONTAL );
 
