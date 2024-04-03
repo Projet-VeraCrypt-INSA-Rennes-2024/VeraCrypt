@@ -381,6 +381,12 @@ namespace VeraCrypt
 	{
 		attributeValue.clear();
 
+		std::cout << "Affichage des sessions:\n";
+		for(const auto& pair: Sessions) {
+			std::cout << pair.first << "\n";
+		}
+		std::cout << "Fin de l'affichage des sessions:\n";
+
 		if (Sessions.find(slotId) == Sessions.end())
 			throw ParameterIncorrect(SRC_POS);
 
@@ -511,7 +517,7 @@ namespace VeraCrypt
 	array<CK_BYTE, 512> SecurityToken::Encrypt(CK_OBJECT_HANDLE publicKey, CK_BYTE_PTR data, CK_ULONG dataLen)
 	{
 		CK_RV status;
-		CK_SESSION_HANDLE session = Sessions[0].Handle;
+		CK_SESSION_HANDLE session = Sessions[0].Handle; //TODO: pas 0 !!!
 		array<CK_BYTE, 512> encryptedData;
 
 		CK_ULONG encryptedDataLen;
@@ -536,7 +542,7 @@ namespace VeraCrypt
     array<CK_BYTE, 512> SecurityToken::Decrypt(CK_OBJECT_HANDLE privateKey, CK_BYTE_PTR data, CK_ULONG dataLen)
     {
         CK_RV status;
-        CK_SESSION_HANDLE session = Sessions[0].Handle;
+        CK_SESSION_HANDLE session = Sessions[0].Handle; //TODO: pas 0 !
         array<CK_BYTE, 512> decryptedData;
 
         CK_ULONG decryptedDataLen;

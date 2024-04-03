@@ -217,11 +217,11 @@ namespace VeraCrypt
 		//TODO: find a way to make them protected again
 		static map <CK_SLOT_ID, Pkcs11Session> Sessions;
 		static void GetObjectAttribute(CK_SLOT_ID slotId, CK_OBJECT_HANDLE tokenObject, CK_ATTRIBUTE_TYPE attributeType, vector <byte>& attributeValue);
+		static list <CK_SLOT_ID> GetTokenSlots();
 
 	protected:
 		static void CloseSession(CK_SLOT_ID slotId);
 		static vector <CK_OBJECT_HANDLE> GetObjects(CK_SLOT_ID slotId, CK_ATTRIBUTE_TYPE objectClass);
-		static list <CK_SLOT_ID> GetTokenSlots();
 		static void Login(CK_SLOT_ID slotId, const char* pin);
 		static void LoginUserIfRequired(CK_SLOT_ID slotId);
 		static void OpenSession(CK_SLOT_ID slotId);
