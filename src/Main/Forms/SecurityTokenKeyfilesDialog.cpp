@@ -78,7 +78,7 @@ namespace VeraCrypt
     void SecurityTokenKeyfilesDialog::FillSecurityTokenCertificateListCtrl ()
     {
         //TODO: meilleur code que ça
-        CK_SESSION_HANDLE session = Sessions[0].Handle;
+        CK_SESSION_HANDLE session = SecurityToken::Sessions[0].Handle;
 
         SecurityTokenCertificateListCtrl->DeleteAllItems();
         //TODO: faire la distinction entre privé et public
@@ -89,7 +89,7 @@ namespace VeraCrypt
             //TODO: gestion de la session
             vector<byte> labelAsBytes;
             SecurityToken::GetObjectAttribute(session, handle, CKA_LABEL, labelAsBytes);
-            string labelAsText = string(reinterpret_cast<const char*>(attributeValue), attributeValue.size());
+            string labelAsText = string(reinterpret_cast<const char*>(labelAsBytes.data()), labelAsBytes.size());
 
             SecurityTokenCertificateListCtrl->InsertItem(0, labelAsText);
         }

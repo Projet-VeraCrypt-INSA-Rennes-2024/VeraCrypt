@@ -213,11 +213,14 @@ namespace VeraCrypt
         static CK_BYTE_PTR Decrypt(CK_OBJECT_HANDLE privateKey,CK_BYTE_PTR data, CK_ULONG dataLen);
         static SecurityCertificateInfo const GetCertificateInfo(CK_SLOT_ID slotId, CK_OBJECT_HANDLE object, CK_ATTRIBUTE_TYPE attributeType);
         static vector <SecurityCertificateInfo> const GetAvailableCertificate();
+		
+		//TODO: find a way to make them protected again
+		static map <CK_SLOT_ID, Pkcs11Session> Sessions;
+		static void GetObjectAttribute(CK_SLOT_ID slotId, CK_OBJECT_HANDLE tokenObject, CK_ATTRIBUTE_TYPE attributeType, vector <byte>& attributeValue);
 
 	protected:
 		static void CloseSession(CK_SLOT_ID slotId);
 		static vector <CK_OBJECT_HANDLE> GetObjects(CK_SLOT_ID slotId, CK_ATTRIBUTE_TYPE objectClass);
-		static void GetObjectAttribute(CK_SLOT_ID slotId, CK_OBJECT_HANDLE tokenObject, CK_ATTRIBUTE_TYPE attributeType, vector <byte>& attributeValue);
 		static list <CK_SLOT_ID> GetTokenSlots();
 		static void Login(CK_SLOT_ID slotId, const char* pin);
 		static void LoginUserIfRequired(CK_SLOT_ID slotId);
@@ -232,7 +235,6 @@ namespace VeraCrypt
 #else
 		static void* Pkcs11LibraryHandle;
 #endif
-		static map <CK_SLOT_ID, Pkcs11Session> Sessions;
 		static unique_ptr <SendExceptionFunctor> WarningCallback;
 
 		friend void SecurityTokenKeyfile::GetKeyfileData(vector <byte>& keyfileData) const;
