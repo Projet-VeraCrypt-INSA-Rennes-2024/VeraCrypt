@@ -91,6 +91,7 @@ namespace VeraCrypt
             SecurityToken::GetObjectAttribute(slotId, handle, CKA_LABEL, labelAsBytes);
             string labelAsText = string(reinterpret_cast<const char*>(labelAsBytes.data()), labelAsBytes.size());
 
+            //créer un wxListItem
             SecurityTokenCertificateListCtrl->InsertItem(0, labelAsText);
         }
     }
