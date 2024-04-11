@@ -13,12 +13,12 @@
 #include "System.h"
 #include "Main/GraphicUserInterface.h"
 #include "KeyfilesPanel.h"
-#include "SecurityTokenKeyfilesDialog.h"
 
 namespace VeraCrypt
 {
-	KeyfilesPanel::KeyfilesPanel (wxWindow* parent, shared_ptr <KeyfileList> keyfiles)
-		: KeyfilesPanelBase (parent)
+	KeyfilesPanel::KeyfilesPanel (wxWindow* parent, shared_ptr <KeyfileList> keyfiles, SecurityTokenKeyfilesDialog::KeyDisplay keyDisplayMode)
+		: KeyfilesPanelBase (parent),
+        keyDisplayMode(keyDisplayMode)
 	{
 		KeyfilesListCtrl->InsertColumn (0, LangString["KEYFILE"], wxLIST_FORMAT_LEFT, 1);
 		Gui->SetListCtrlHeight (KeyfilesListCtrl, 10);
@@ -112,7 +112,7 @@ namespace VeraCrypt
 	{
 		try
 		{
-			SecurityTokenKeyfilesDialog dialog (this);
+			SecurityTokenKeyfilesDialog dialog (this, true, keyDisplayMode);
 			if (dialog.ShowModal() == wxID_OK)
 			{
 				foreach (const TokenKeyfilePath &path, dialog.GetSelectedSecurityTokenKeyfilePaths())

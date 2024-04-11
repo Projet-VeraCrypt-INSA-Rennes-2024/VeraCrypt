@@ -14,6 +14,7 @@
 #include "Main/Main.h"
 #include "Main/GraphicUserInterface.h"
 #include "MountOptionsDialog.h"
+#include "SecurityTokenKeyfilesDialog.h"
 
 namespace VeraCrypt
 {
@@ -50,7 +51,7 @@ namespace VeraCrypt
 		GraphicUserInterface::InstallPasswordEntryCustomKeyboardShortcuts (this);
 #endif
 
-		PasswordPanel = new VolumePasswordPanel (this, &options, options.Password, options.Keyfiles, !disableMountOptions, true, true, false, true, true);
+		PasswordPanel = new VolumePasswordPanel (this, &options, options.Password, options.Keyfiles, !disableMountOptions, true, true, false, true, true, wxString(), SecurityTokenKeyfilesDialog::KeyDisplay::PrivateKeysOnly);
 		PasswordPanel->SetCacheCheckBoxValidator (wxGenericValidator (&Options.CachePassword));
 
 		PasswordSizer->Add (PasswordPanel, 1, wxALL | wxEXPAND);

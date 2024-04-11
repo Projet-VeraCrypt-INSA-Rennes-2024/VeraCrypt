@@ -16,13 +16,14 @@
 #include "Forms.h"
 #include "Main/Main.h"
 #include "KeyfilesPanel.h"
+#include "SecurityTokenKeyfilesDialog.h"
 
 namespace VeraCrypt
 {
 	class KeyfilesDialog : public KeyfilesDialogBase
 	{
 	public:
-		KeyfilesDialog (wxWindow* parent, shared_ptr <KeyfileList> keyfiles);
+		KeyfilesDialog (wxWindow* parent, shared_ptr <KeyfileList> keyfiles, SecurityTokenKeyfilesDialog::KeyDisplay keyDisplayMode);
 		shared_ptr <KeyfileList> GetKeyfiles () const { return mKeyfilesPanel->GetKeyfiles(); }
 
 	protected:

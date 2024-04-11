@@ -16,13 +16,14 @@
 #include "Forms.h"
 #include "Platform/Functor.h"
 #include "Main/Main.h"
+#include "SecurityTokenKeyfilesDialog.h"
 
 namespace VeraCrypt
 {
 	class VolumePasswordPanel : public VolumePasswordPanelBase
 	{
 	public:
-		VolumePasswordPanel (wxWindow* parent, MountOptions* options, shared_ptr <VolumePassword> password, shared_ptr <KeyfileList> keyfiles, bool enableCache = false, bool enablePassword = true, bool enableKeyfiles = true, bool enableConfirmation = false, bool enablePkcs5Prf = false, bool isMountPassword = false, const wxString &passwordLabel = wxString());
+		VolumePasswordPanel (wxWindow* parent, MountOptions* options, shared_ptr <VolumePassword> password, shared_ptr <KeyfileList> keyfiles, bool enableCache = false, bool enablePassword = true, bool enableKeyfiles = true, bool enableConfirmation = false, bool enablePkcs5Prf = false, bool isMountPassword = false, const wxString &passwordLabel = wxString(), SecurityTokenKeyfilesDialog::KeyDisplay = SecurityTokenKeyfilesDialog::KeyDisplay::None);
 		virtual ~VolumePasswordPanel ();
 
 		void AddKeyfile (shared_ptr <Keyfile> keyfile);
@@ -65,6 +66,7 @@ namespace VeraCrypt
 		shared_ptr <KeyfileList> Keyfiles;
 		shared_ptr <Functor> UpdateCallback;
 		bool EnablePimEntry;
+        SecurityTokenKeyfilesDialog::KeyDisplay keyDisplayMode;
 	};
 }
 

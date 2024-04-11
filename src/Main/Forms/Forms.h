@@ -707,6 +707,7 @@ namespace VeraCrypt
 			virtual void OnListItemActivated( wxListEvent& event ) { event.Skip(); }
 			virtual void OnListItemDeselected( wxListEvent& event ) { event.Skip(); }
 			virtual void OnListItemSelected( wxListEvent& event ) { event.Skip(); }
+            virtual void OnKeyListItemSelected( wxListEvent& event ) { event.Skip(); }
 			virtual void OnExportButtonClick( wxCommandEvent& event ) { event.Skip(); }
 			virtual void OnDeleteButtonClick( wxCommandEvent& event ) { event.Skip(); }
 			virtual void OnImportButtonClick( wxCommandEvent& event ) { event.Skip(); }

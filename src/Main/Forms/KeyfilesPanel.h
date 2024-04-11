@@ -15,13 +15,14 @@
 
 #include "Forms.h"
 #include "Main/Main.h"
+#include "SecurityTokenKeyfilesDialog.h"
 
 namespace VeraCrypt
 {
 	class KeyfilesPanel : public KeyfilesPanelBase
 	{
 	public:
-		KeyfilesPanel (wxWindow* parent, shared_ptr <KeyfileList> keyfiles);
+		KeyfilesPanel (wxWindow* parent, shared_ptr <KeyfileList> keyfiles, SecurityTokenKeyfilesDialog::KeyDisplay keyDisplayMode = SecurityTokenKeyfilesDialog::KeyDisplay::None);
 		void AddKeyfile (shared_ptr <Keyfile> keyfile);
 		shared_ptr <KeyfileList> GetKeyfiles () const;
 
@@ -35,6 +36,8 @@ namespace VeraCrypt
 		void OnRemoveButtonClick (wxCommandEvent& event);
 		void OnRemoveAllButtonClick (wxCommandEvent& event);
 		void UpdateButtons ();
+
+        SecurityTokenKeyfilesDialog::KeyDisplay keyDisplayMode;
 	};
 }
 

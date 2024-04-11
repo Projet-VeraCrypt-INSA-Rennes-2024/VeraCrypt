@@ -24,9 +24,17 @@ namespace VeraCrypt
 	class SecurityTokenKeyfilesDialog : public SecurityTokenKeyfilesDialogBase
 	{
 	public:
-		SecurityTokenKeyfilesDialog (wxWindow* parent, bool selectionMode = true);
-		list <TokenKeyfilePath> GetSelectedSecurityTokenKeyfilePaths() const { return SelectedSecurityTokenKeyfilePaths; }
+        enum KeyDisplay
+        {
+            PrivateKeysOnly,
+            PublicKeysOnly,
+            Both,
+            None
+        };
 
+		SecurityTokenKeyfilesDialog (wxWindow* parent, bool selectionMode = true, KeyDisplay keyDisplayMode = KeyDisplay::None);
+		list <TokenKeyfilePath> GetSelectedSecurityTokenKeyfilePaths() const { return SelectedSecurityTokenKeyfilePaths; }
+        
 	protected:
 		enum
 		{
@@ -48,12 +56,14 @@ namespace VeraCrypt
 		void OnListItemActivated (wxListEvent& event) { OnOKButtonClick(); }
 		void OnListItemDeselected (wxListEvent& event);
 		void OnListItemSelected (wxListEvent& event);
+        void OnKeyListItemSelected(wxListEvent& event);
 		void OnOKButtonClick ();
 		void OnOKButtonClick (wxCommandEvent& event) { OnOKButtonClick(); }
 
 		vector <shared_ptr<TokenKeyfile>> SecurityTokenKeyfileList;
 		vector <CK_OBJECT_HANDLE> SecurityTokenCertificateList;
 		list <TokenKeyfilePath> SelectedSecurityTokenKeyfilePaths;
+        KeyDisplay keyDisplayMode;
 	};
 }
 

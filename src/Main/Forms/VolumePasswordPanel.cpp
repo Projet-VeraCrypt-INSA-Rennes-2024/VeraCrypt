@@ -18,8 +18,8 @@
 
 namespace VeraCrypt
 {
-	VolumePasswordPanel::VolumePasswordPanel (wxWindow* parent, MountOptions* options, shared_ptr <VolumePassword> password, shared_ptr <KeyfileList> keyfiles, bool enableCache, bool enablePassword, bool enableKeyfiles, bool enableConfirmation, bool enablePkcs5Prf, bool isMountPassword, const wxString &passwordLabel)
-		: VolumePasswordPanelBase (parent), TopOwnerParent(NULL), Keyfiles (new KeyfileList), EnablePimEntry (true)
+	VolumePasswordPanel::VolumePasswordPanel (wxWindow* parent, MountOptions* options, shared_ptr <VolumePassword> password, shared_ptr <KeyfileList> keyfiles, bool enableCache, bool enablePassword, bool enableKeyfiles, bool enableConfirmation, bool enablePkcs5Prf, bool isMountPassword, const wxString &passwordLabel, SecurityTokenKeyfilesDialog::KeyDisplay keyDisplay)
+		: VolumePasswordPanelBase (parent), TopOwnerParent(NULL), Keyfiles (new KeyfileList), EnablePimEntry (true), keyDisplayMode(keyDisplay)
 	{
 		size_t maxPasswordLength = CmdLine->ArgUseLegacyPassword? VolumePassword::MaxLegacySize : VolumePassword::MaxSize;
 		if (keyfiles)
@@ -379,7 +379,7 @@ namespace VeraCrypt
 
 	void VolumePasswordPanel::OnKeyfilesButtonClick (wxCommandEvent& event)
 	{
-		KeyfilesDialog dialog (GetParent(), Keyfiles);
+		KeyfilesDialog dialog (GetParent(), Keyfiles, keyDisplayMode);
 
 		if (dialog.ShowModal() == wxID_OK)
 		{

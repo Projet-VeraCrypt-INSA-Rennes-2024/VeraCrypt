@@ -18,8 +18,9 @@
 
 namespace VeraCrypt
 {
-	SecurityTokenKeyfilesDialog::SecurityTokenKeyfilesDialog (wxWindow* parent, bool selectionMode)
-		: SecurityTokenKeyfilesDialogBase (parent)
+	SecurityTokenKeyfilesDialog::SecurityTokenKeyfilesDialog (wxWindow* parent, bool selectionMode, KeyDisplay displayMode)
+		: SecurityTokenKeyfilesDialogBase (parent),
+        keyDisplayMode(displayMode)
 	{
 		if (selectionMode)
 			SetTitle (LangString["SELECT_TOKEN_KEYFILES"]);
@@ -34,10 +35,31 @@ namespace VeraCrypt
 		colPermilles.push_back (529);
 
         //TODO: i18n
-        SecurityTokenCertificateListCtrl->InsertColumn(ColumnSecurityTokenCertificate, "Certificat", wxLIST_FORMAT_LEFT, 1);
+        SecurityTokenCertificateListCtrl->InsertColumn(ColumnSecurityTokenCertificate, "Clé", wxLIST_FORMAT_LEFT, 1);
+        SecurityTokenCertificateListCtrl->SetSingleStyle(wxLC_SINGLE_SEL, true);
 
 		FillSecurityTokenKeyfileListCtrl();
-        FillSecurityTokenCertificateListCtrl(); 
+
+        switch (displayMode)
+        {
+            case KeyDisplay::PrivateKeysOnly:
+                std::cout << "private only\n";
+                break;
+            case KeyDisplay::PublicKeysOnly:
+                std::cout << "public only\n";
+                break;
+            case KeyDisplay::Both:
+                std::cout << "both\n";
+                break;
+            case KeyDisplay::None:
+                std::cout << "none\n";
+                break;
+        }
+
+        if(displayMode != KeyDisplay::None)
+        {
+            FillSecurityTokenCertificateListCtrl();
+        }
 
 		Gui->SetListCtrlWidth (SecurityTokenKeyfileListCtrl, 65);
 		Gui->SetListCtrlHeight (SecurityTokenKeyfileListCtrl, 16);
@@ -78,7 +100,7 @@ namespace VeraCrypt
     void SecurityTokenKeyfilesDialog::FillSecurityTokenCertificateListCtrl ()
     {
         //TODO: meilleur code que ça
-		CK_SLOT_ID slotId = SecurityToken::GetTokenSlots().front();
+		/*CK_SLOT_ID slotId = SecurityToken::GetTokenSlots().front();
 
         SecurityTokenCertificateListCtrl->DeleteAllItems();
         //TODO: faire la distinction entre privé et public
@@ -95,6 +117,17 @@ namespace VeraCrypt
             keyItem->setData(reinterpret_cast<void*>(handle));
             keyItem->setText(labelAsText);
 
+            SecurityTokenCertificateListCtrl->InsertItem(keyItem);
+        }*/
+
+        SecurityTokenCertificateListCtrl->DeleteAllItems();
+
+        for(int i = 0; i < 10; i++)
+        {
+            wxListItem keyItem;
+            keyItem.SetId(i);
+            keyItem.SetData((void*)(i*20));
+            keyItem.SetText(to_string(i));
             SecurityTokenCertificateListCtrl->InsertItem(keyItem);
         }
     }
@@ -200,7 +233,7 @@ namespace VeraCrypt
 
 	void SecurityTokenKeyfilesDialog::OnListItemDeselected (wxListEvent& event)
 	{
-		if (SecurityTokenKeyfileListCtrl->GetSelectedItemCount() == 0)
+		if (SecurityTokenKeyfileListCtrl->GetSelectedItemCount() == 0 && SecurityTokenCertificateListCtrl->GetSelectedItemCount() == 0)
 		{
 			DeleteButton->Disable();
 			ExportButton->Disable();
@@ -232,6 +265,11 @@ namespace VeraCrypt
 		}
 	}
 
+    void SecurityTokenKeyfilesDialog::OnKeyListItemSelected(wxListEvent& event)
+    {
+        OKButton->Enable();
+    }
+
 	void SecurityTokenKeyfilesDialog::OnOKButtonClick ()
 	{
 		foreach (long item, Gui->GetListCtrlSelectedItems (SecurityTokenKeyfileListCtrl))
@@ -240,6 +278,16 @@ namespace VeraCrypt
 
 			SelectedSecurityTokenKeyfilePaths.push_back(*key);
 		}
+
+        long selectedItemId = SecurityTokenCertificateListCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+        if (selectedItemId == -1)
+        {
+            return;
+        }
+
+        int itemData = (int)SecurityTokenCertificateListCtrl->GetItemData(selectedItemId);
+        cout << "Selected key data: " << itemData << "\n";
+
 		EndModal (wxID_OK);
 	}
 }

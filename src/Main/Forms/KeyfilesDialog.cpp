@@ -16,10 +16,10 @@
 
 namespace VeraCrypt
 {
-	KeyfilesDialog::KeyfilesDialog (wxWindow* parent, shared_ptr <KeyfileList> keyfiles)
+	KeyfilesDialog::KeyfilesDialog (wxWindow* parent, shared_ptr <KeyfileList> keyfiles, SecurityTokenKeyfilesDialog::KeyDisplay keyDisplayMode)
 		: KeyfilesDialogBase (parent), Keyfiles (keyfiles)
 	{
-		mKeyfilesPanel = new KeyfilesPanel (this, keyfiles);
+		mKeyfilesPanel = new KeyfilesPanel (this, keyfiles, keyDisplayMode);
 		PanelSizer->Add (mKeyfilesPanel, 1, wxALL | wxEXPAND);
 
 		WarningStaticText->SetLabel (LangString["IDT_KEYFILE_WARNING"]);
