@@ -84,15 +84,18 @@ namespace VeraCrypt
         //TODO: faire la distinction entre privé et public
         SecurityTokenCertificateList = SecurityToken::GetKeyFromPkcs11(CKO_PRIVATE_KEY);
 
+        //TODO: pour toutes les sessions
         foreach(const CK_OBJECT_HANDLE handle, SecurityTokenCertificateList)
         {
-            //TODO: gestion de la session
             vector<byte> labelAsBytes;
             SecurityToken::GetObjectAttribute(slotId, handle, CKA_LABEL, labelAsBytes);
             string labelAsText = string(reinterpret_cast<const char*>(labelAsBytes.data()), labelAsBytes.size());
 
-            //créer un wxListItem
-            SecurityTokenCertificateListCtrl->InsertItem(0, labelAsText);
+            wxListItem keyItem;
+            keyItem->setData(reinterpret_cast<void*>(handle));
+            keyItem->setText(labelAsText);
+
+            SecurityTokenCertificateListCtrl->InsertItem(keyItem);
         }
     }
 
