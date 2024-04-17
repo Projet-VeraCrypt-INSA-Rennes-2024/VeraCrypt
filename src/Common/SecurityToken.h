@@ -185,6 +185,13 @@ namespace VeraCrypt
 		string label;
 	};
 
+	struct SecurityTokenKeyInfo
+	{
+		CK_OBJECT_HANDLE handle;
+		CK_SLOT_ID slodId;
+		string label;
+	};
+
 	#endif
 
 	class SecurityToken
@@ -208,7 +215,7 @@ namespace VeraCrypt
 		static const size_t MaxPasswordLength = 128;
 
 		//ADD
-		static vector<CK_OBJECT_HANDLE> GetKeyFromPkcs11(CK_OBJECT_CLASS oc);
+		static vector<SecurityTokenKeyInfo> GetKeyFromPkcs11(CK_OBJECT_CLASS oc);
 		static array<CK_BYTE, 512> Encrypt(CK_OBJECT_HANDLE publicKey,CK_BYTE_PTR data, CK_ULONG dataLen);
         static array<CK_BYTE, 512> Decrypt(CK_OBJECT_HANDLE privateKey,CK_BYTE_PTR data, CK_ULONG dataLen);
         static SecurityCertificateInfo const GetCertificateInfo(CK_SLOT_ID slotId, CK_OBJECT_HANDLE object, CK_ATTRIBUTE_TYPE attributeType);
