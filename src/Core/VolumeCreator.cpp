@@ -340,7 +340,7 @@ namespace VeraCrypt
 
 			//SecurityToken::GetAvailableCertificate();
 
-			vector<CK_OBJECT_HANDLE> pub = SecurityToken::GetKeyFromPkcs11(CKO_PUBLIC_KEY);
+			//vector<CK_OBJECT_HANDLE> pub = SecurityToken::GetKeyFromPkcs11(CKO_PUBLIC_KEY); TODO: pourquoi c'est là ?
 
 			//SecurityToken::Encrypt(pub,pkirandom,pkirandom.Size());
 

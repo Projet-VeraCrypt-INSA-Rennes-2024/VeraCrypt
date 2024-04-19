@@ -40,7 +40,7 @@ namespace VeraCrypt
 
 		FillSecurityTokenKeyfileListCtrl();
 
-        switch (displayMode)
+        /*switch (displayMode)
         {
             case KeyDisplay::PrivateKeysOnly:
                 std::cout << "private only\n";
@@ -54,7 +54,7 @@ namespace VeraCrypt
             case KeyDisplay::None:
                 std::cout << "none\n";
                 break;
-        }
+        }*/
 
         if(displayMode != KeyDisplay::None)
         {
@@ -99,28 +99,25 @@ namespace VeraCrypt
 
     void SecurityTokenKeyfilesDialog::FillSecurityTokenCertificateListCtrl ()
     {
-        //TODO: meilleur code que ça
-		/*CK_SLOT_ID slotId = SecurityToken::GetTokenSlots().front();
-
         SecurityTokenCertificateListCtrl->DeleteAllItems();
-        //TODO: faire la distinction entre privé et public
-        SecurityTokenCertificateList = SecurityToken::GetKeyFromPkcs11(CKO_PRIVATE_KEY);
 
-        //TODO: pour toutes les sessions
-        foreach(const CK_OBJECT_HANDLE handle, SecurityTokenCertificateList)
-        {
-            vector<byte> labelAsBytes;
-            SecurityToken::GetObjectAttribute(slotId, handle, CKA_LABEL, labelAsBytes);
-            string labelAsText = string(reinterpret_cast<const char*>(labelAsBytes.data()), labelAsBytes.size());
+		const auto objectType = keyDisplayMode == KeyDisplay::PrivateKeysOnly ? CKO_PRIVATE_KEY : CKO_PUBLIC_KEY;
+        SecurityTokenCertificateList = SecurityToken::GetKeyFromPkcs11(objectType);
+
+        for(int i = 0; i < SecurityTokenCertificateList.size(); i++)
+		{
+			const SecurityTokenKeyInfo& keyInfo = SecurityTokenCertificateList[i];
 
             wxListItem keyItem;
-            keyItem->setData(reinterpret_cast<void*>(handle));
-            keyItem->setText(labelAsText);
+
+			keyItem.SetId(i);
+            keyItem.SetData(reinterpret_cast<void*>(i));
+            keyItem.SetText(keyInfo.label);
 
             SecurityTokenCertificateListCtrl->InsertItem(keyItem);
-        }*/
+        }
 
-        SecurityTokenCertificateListCtrl->DeleteAllItems();
+        /*SecurityTokenCertificateListCtrl->DeleteAllItems();
 
         for(int i = 0; i < 10; i++)
         {
@@ -129,7 +126,7 @@ namespace VeraCrypt
             keyItem.SetData((void*)(i*20));
             keyItem.SetText(to_string(i));
             SecurityTokenCertificateListCtrl->InsertItem(keyItem);
-        }
+        }*/
     }
 
 	void SecurityTokenKeyfilesDialog::OnDeleteButtonClick (wxCommandEvent& event)

@@ -28,7 +28,6 @@ namespace VeraCrypt
         {
             PrivateKeysOnly,
             PublicKeysOnly,
-            Both,
             None
         };
 
@@ -61,7 +60,7 @@ namespace VeraCrypt
 		void OnOKButtonClick (wxCommandEvent& event) { OnOKButtonClick(); }
 
 		vector <shared_ptr<TokenKeyfile>> SecurityTokenKeyfileList;
-		vector <CK_OBJECT_HANDLE> SecurityTokenCertificateList;
+		vector <SecurityTokenKeyInfo> SecurityTokenCertificateList;
 		list <TokenKeyfilePath> SelectedSecurityTokenKeyfilePaths;
         KeyDisplay keyDisplayMode;
 	};

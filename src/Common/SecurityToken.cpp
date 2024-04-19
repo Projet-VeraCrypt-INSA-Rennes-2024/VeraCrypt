@@ -472,10 +472,9 @@ namespace VeraCrypt
 
 	}*/
 
-	vector<CK_OBJECT_HANDLE> SecurityToken::GetKeyFromPkcs11(CK_OBJECT_CLASS oc)
+	vector<SecurityTokenKeyInfo> SecurityToken::GetKeyFromPkcs11(CK_OBJECT_CLASS oc)
 	{
-
-		vector <CK_OBJECT_HANDLE> rep;
+		vector <SecurityTokenKeyInfo> rep;
 
 		foreach(const CK_SLOT_ID & slotId, GetTokenSlots())
 		{
@@ -501,14 +500,11 @@ namespace VeraCrypt
 			}
 
 			foreach(const CK_OBJECT_HANDLE & dataHandle, GetObjects(slotId, oc)){
-				vector <byte> label;
-				GetObjectAttribute(slotId, dataHandle, CKA_LABEL, label);
-				std::cout << "ck :" << std::endl;
-				for(byte b: label){
-					std::cout << b;
-				}
-				rep.push_back(dataHandle);
-				std::cout << std::endl;
+				vector<byte> labelAsBytes;
+				GetObjectAttribute(slotId, dataHandle, CKA_LABEL, labelAsBytes);
+	            string labelAsText = string(reinterpret_cast<const char*>(labelAsBytes.data()), labelAsBytes.size());
+				
+				rep.push_back({dataHandle, slotId, labelAsText});
 			}
 		}
 
