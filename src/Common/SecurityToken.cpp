@@ -511,10 +511,10 @@ namespace VeraCrypt
 		return rep;
 	}
 
-	array<CK_BYTE, 512> SecurityToken::Encrypt(CK_OBJECT_HANDLE publicKey, CK_BYTE_PTR data, CK_ULONG dataLen)
+	array<CK_BYTE, 512> SecurityToken::Encrypt(const SecurityTokenKeyInfo& publicKey, CK_BYTE_PTR data, CK_ULONG dataLen)
 	{
 		CK_RV status;
-		CK_SESSION_HANDLE session = Sessions[0].Handle; //TODO: pas 0 !!!
+		CK_SESSION_HANDLE session = Sessions[publicKey.slotId].Handle;
 		array<CK_BYTE, 512> encryptedData;
 
 		CK_ULONG encryptedDataLen;
@@ -523,7 +523,7 @@ namespace VeraCrypt
 
 		CK_MECHANISM mechanism = {CKM_RSA_PKCS_OAEP, &oaepParams, sizeof(oaepParams)};
 
-		status = Pkcs11Functions->C_EncryptInit(session,&mechanism,publicKey);
+		status = Pkcs11Functions->C_EncryptInit(session,&mechanism,publicKey.handle);
 		status = Pkcs11Functions->C_Encrypt(session, data, dataLen, encryptedData.data(), &encryptedDataLen);
 
 		if (status != CKR_OK)
@@ -536,10 +536,10 @@ namespace VeraCrypt
 
 	}
 
-    array<CK_BYTE, 512> SecurityToken::Decrypt(CK_OBJECT_HANDLE privateKey, CK_BYTE_PTR data, CK_ULONG dataLen)
+    array<CK_BYTE, 512> SecurityToken::Decrypt(const SecurityTokenKeyInfo& privateKey, CK_BYTE_PTR data, CK_ULONG dataLen)
     {
         CK_RV status;
-        CK_SESSION_HANDLE session = Sessions[0].Handle; //TODO: pas 0 !
+        CK_SESSION_HANDLE session = Sessions[privateKey.slotId].Handle;
         array<CK_BYTE, 512> decryptedData;
 
         CK_ULONG decryptedDataLen;
@@ -548,7 +548,7 @@ namespace VeraCrypt
 
         CK_MECHANISM mechanism = {CKM_RSA_PKCS_OAEP, &oaepParams, sizeof(oaepParams)};
 
-        status = Pkcs11Functions->C_DecryptInit(session,&mechanism,privateKey);
+        status = Pkcs11Functions->C_DecryptInit(session,&mechanism,privateKey.handle);
         status = Pkcs11Functions->C_Decrypt(session, data, dataLen, decryptedData.data(), &decryptedDataLen);
 
         if (status != CKR_OK)
