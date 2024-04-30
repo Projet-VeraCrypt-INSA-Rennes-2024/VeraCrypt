@@ -115,6 +115,8 @@ namespace VeraCrypt
 			SecurityTokenKeyfilesDialog dialog (this, true, keyDisplayMode);
 			if (dialog.ShowModal() == wxID_OK)
 			{
+                SelectedSecurityTokenKey = dialog.GetSelectedSecurityTokenKey();
+
 				foreach (const TokenKeyfilePath &path, dialog.GetSelectedSecurityTokenKeyfilePaths())
 				{
 					vector <wstring> fields;

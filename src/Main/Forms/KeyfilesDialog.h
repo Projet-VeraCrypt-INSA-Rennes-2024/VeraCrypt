@@ -25,6 +25,7 @@ namespace VeraCrypt
 	public:
 		KeyfilesDialog (wxWindow* parent, shared_ptr <KeyfileList> keyfiles, SecurityTokenKeyfilesDialog::KeyDisplay keyDisplayMode);
 		shared_ptr <KeyfileList> GetKeyfiles () const { return mKeyfilesPanel->GetKeyfiles(); }
+        SecurityTokenKeyInfo* GetSelectedSecurityTokenKey() const { return mKeyfilesPanel->GetSelectedSecurityTokenKey(); }
 
 	protected:
 		void OnCreateKeyfileButttonClick (wxCommandEvent& event);

@@ -20,6 +20,7 @@ namespace VeraCrypt
 {
 	SecurityTokenKeyfilesDialog::SecurityTokenKeyfilesDialog (wxWindow* parent, bool selectionMode, KeyDisplay displayMode)
 		: SecurityTokenKeyfilesDialogBase (parent),
+        selectedSecurityTokenKey(nullptr),
         keyDisplayMode(displayMode)
 	{
 		if (selectionMode)
@@ -39,22 +40,6 @@ namespace VeraCrypt
         SecurityTokenCertificateListCtrl->SetSingleStyle(wxLC_SINGLE_SEL, true);
 
 		FillSecurityTokenKeyfileListCtrl();
-
-        /*switch (displayMode)
-        {
-            case KeyDisplay::PrivateKeysOnly:
-                std::cout << "private only\n";
-                break;
-            case KeyDisplay::PublicKeysOnly:
-                std::cout << "public only\n";
-                break;
-            case KeyDisplay::Both:
-                std::cout << "both\n";
-                break;
-            case KeyDisplay::None:
-                std::cout << "none\n";
-                break;
-        }*/
 
         if(displayMode != KeyDisplay::None)
         {
@@ -116,17 +101,6 @@ namespace VeraCrypt
 
             SecurityTokenCertificateListCtrl->InsertItem(keyItem);
         }
-
-        /*SecurityTokenCertificateListCtrl->DeleteAllItems();
-
-        for(int i = 0; i < 10; i++)
-        {
-            wxListItem keyItem;
-            keyItem.SetId(i);
-            keyItem.SetData((void*)(i*20));
-            keyItem.SetText(to_string(i));
-            SecurityTokenCertificateListCtrl->InsertItem(keyItem);
-        }*/
     }
 
 	void SecurityTokenKeyfilesDialog::OnDeleteButtonClick (wxCommandEvent& event)
@@ -283,7 +257,7 @@ namespace VeraCrypt
         }
 
         int itemData = (int)SecurityTokenCertificateListCtrl->GetItemData(selectedItemId);
-        cout << "Selected key data: " << itemData << "\n";
+        selectedSecurityTokenKey = new SecurityTokenKeyInfo(SecurityTokenCertificateList[itemData]);
 
 		EndModal (wxID_OK);
 	}

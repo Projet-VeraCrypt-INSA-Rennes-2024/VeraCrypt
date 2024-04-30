@@ -26,14 +26,15 @@ namespace VeraCrypt
 	public:
         enum KeyDisplay
         {
+            None,
             PrivateKeysOnly,
-            PublicKeysOnly,
-            None
+            PublicKeysOnly
         };
 
 		SecurityTokenKeyfilesDialog (wxWindow* parent, bool selectionMode = true, KeyDisplay keyDisplayMode = KeyDisplay::None);
 		list <TokenKeyfilePath> GetSelectedSecurityTokenKeyfilePaths() const { return SelectedSecurityTokenKeyfilePaths; }
-        
+        SecurityTokenKeyInfo* GetSelectedSecurityTokenKey() const { return selectedSecurityTokenKey; }
+
 	protected:
 		enum
 		{
@@ -62,6 +63,7 @@ namespace VeraCrypt
 		vector <shared_ptr<TokenKeyfile>> SecurityTokenKeyfileList;
 		vector <SecurityTokenKeyInfo> SecurityTokenCertificateList;
 		list <TokenKeyfilePath> SelectedSecurityTokenKeyfilePaths;
+        SecurityTokenKeyInfo *selectedSecurityTokenKey;
         KeyDisplay keyDisplayMode;
 	};
 }

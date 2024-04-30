@@ -25,6 +25,7 @@ namespace VeraCrypt
 		KeyfilesPanel (wxWindow* parent, shared_ptr <KeyfileList> keyfiles, SecurityTokenKeyfilesDialog::KeyDisplay keyDisplayMode = SecurityTokenKeyfilesDialog::KeyDisplay::None);
 		void AddKeyfile (shared_ptr <Keyfile> keyfile);
 		shared_ptr <KeyfileList> GetKeyfiles () const;
+        SecurityTokenKeyInfo* GetSelectedSecurityTokenKey() const { return SelectedSecurityTokenKey; }
 
 	protected:
 		void OnAddFilesButtonClick (wxCommandEvent& event);
@@ -38,6 +39,7 @@ namespace VeraCrypt
 		void UpdateButtons ();
 
         SecurityTokenKeyfilesDialog::KeyDisplay keyDisplayMode;
+        SecurityTokenKeyInfo* SelectedSecurityTokenKey;
 	};
 }
 

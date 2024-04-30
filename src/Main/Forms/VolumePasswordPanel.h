@@ -41,6 +41,7 @@ namespace VeraCrypt
 		bool IsUsePimChecked () const { return PimCheckBox->GetValue (); }
 		void SetUsePimChecked (bool checked) const { PimCheckBox->SetValue (checked); }
 		bool UpdatePimHelpText (bool pimChanged);
+        SecurityTokenKeyInfo* GetSelectedSecurityTokenKey() const { return SelectedSecurityTokenKey; }
 
 		Event UpdateEvent;
 		wxWindow* TopOwnerParent; // use to handle layout when embedded inside sizer child
@@ -67,7 +68,8 @@ namespace VeraCrypt
 		shared_ptr <Functor> UpdateCallback;
 		bool EnablePimEntry;
         SecurityTokenKeyfilesDialog::KeyDisplay keyDisplayMode;
-	};
+        SecurityTokenKeyInfo* SelectedSecurityTokenKey;
+    };
 }
 
 #endif // TC_HEADER_Main_Forms_PasswordPanel

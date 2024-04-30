@@ -770,6 +770,7 @@ namespace VeraCrypt
 
 				Kdf = page->GetPkcs5Kdf();
 				Keyfiles = page->GetKeyfiles();
+                SecurityTokenKey = page->GetSelectedSecurityTokenKey();
 
 				if (forward && Password && !Password->IsEmpty())
 				{
@@ -1032,7 +1033,7 @@ namespace VeraCrypt
 						options->Type = OuterVolume ? VolumeType::Normal : SelectedVolumeType;
 						options->VolumeHeaderKdf = Pkcs5Kdf::GetAlgorithm (*SelectedHash);
 						options->EMVSupportEnabled = Gui->GetPreferences().EMVSupportEnabled;
-
+                        options->SecurityTokenKey = SecurityTokenKey;
 
 						Creator.reset (new VolumeCreator);
 						VolumeCreatorThreadRoutine routine(options, Creator);

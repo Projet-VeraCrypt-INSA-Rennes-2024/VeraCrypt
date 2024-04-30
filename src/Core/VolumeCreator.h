@@ -16,6 +16,7 @@
 #include "Platform/Platform.h"
 #include "Volume/Volume.h"
 #include "RandomNumberGenerator.h"
+#include "Common/SecurityToken.h"
 #if defined (TC_LINUX)
 #include "Platform/Unix/Process.h"
 #include <errno.h>
@@ -39,6 +40,7 @@ namespace VeraCrypt
 		shared_ptr <EncryptionAlgorithm> EA;
 		bool Quick;
 		bool EMVSupportEnabled;
+        SecurityTokenKeyInfo* SecurityTokenKey;
 
 		struct FilesystemType
 		{
