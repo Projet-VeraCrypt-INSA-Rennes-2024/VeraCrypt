@@ -32,8 +32,6 @@
 
 #include "SecurityToken.h"
 
-//ADD
-#include <iostream>
 #include <array>
 
 using namespace std;
@@ -427,35 +425,6 @@ namespace VeraCrypt
 		return slots;
 	}
 
-	//ADD
-	/*CK_OBJECT_HANDLE SecurityToken::GetCertificate()
-	{
-		CheckLibraryStatus();
-
-		CK_ULONG ckCount;
-		CK_RV status;
-
-		CK_OBJECT_HANDLE ck;
-		CK_SESSION_HANDLE session = Sessions[0].Handle; //CHANGE
-		
-		CK_OBJECT_CLASS pubClass = CKO_PUBLIC_KEY;
-		CK_ATTRIBUTE pubTemplate[] = {
-			{CKA_CLASS, &pubClass, sizeof(pubClass)},
-		};
-
-		status = Pkcs11Functions->C_FindObjectsInit(session, pubTemplate, sizeof(pubTemplate) / sizeof(CK_ATTRIBUTE));
-		status = Pkcs11Functions->C_FindObjects(session, &ck, 1, &ckCount);
-		status = Pkcs11Functions->C_FindObjectsFinal(session); 
-
-		if (status != CKR_OK)
-			throw Pkcs11Exception(status);
-
-		std::cout << "Numbers of certificate : " << ckCount << std::endl;
-
-		return ck;
-
-	}*/
-
 	vector<SecurityTokenKeyInfo> SecurityToken::GetKeyFromPkcs11(CK_OBJECT_CLASS oc)
 	{
 		vector <SecurityTokenKeyInfo> rep;
@@ -540,51 +509,6 @@ namespace VeraCrypt
         }
 
 		return decryptedData;
-
-    }
-
-	SecurityCertificateInfo const SecurityToken::GetCertificateInfo(CK_SLOT_ID slotId, CK_OBJECT_HANDLE object, CK_ATTRIBUTE_TYPE attributeType){
-        
-        SecurityCertificateInfo certificate;
-        certificate.cert = object;
-
-        vector <byte> attributeValue;
-
-        SecurityToken::GetObjectAttribute(slotId,object,attributeType,attributeValue);
-
-		certificate.label = string(reinterpret_cast<const char*>(&attributeValue[0]),attributeValue.size());
-
-		std::cout << certificate.label << std::endl;
-
-        return certificate;
-        
-    }
-
-    vector <SecurityCertificateInfo> const SecurityToken::GetAvailableCertificate(){
-        
-        vector <SecurityCertificateInfo> certificates;
-        CK_ATTRIBUTE_TYPE objectClass = CKO_PUBLIC_KEY;
-
-        CK_SLOT_ID slotId = SecurityToken::GetTokenSlots().front();
-        
-        vector <CK_OBJECT_HANDLE> certificatesHandle = SecurityToken::GetObjects(slotId,objectClass);
-
-        for(CK_OBJECT_HANDLE cert: certificatesHandle) {
-            
-            try {
-
-                certificates.push_back(GetCertificateInfo(slotId,cert,CKA_LABEL));
-
-            } catch (Pkcs11Exception& e){
-                
-                std::cout << e.GetSubject().c_str() << std::endl;  // Debug
-
-                throw Pkcs11Exception(e);
-            }
-
-        }
-
-        return certificates;
 
     }
 

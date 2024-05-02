@@ -214,15 +214,10 @@ namespace VeraCrypt
 
 		static const size_t MaxPasswordLength = 128;
 
-		//ADD
 		static vector<SecurityTokenKeyInfo> GetKeyFromPkcs11(CK_OBJECT_CLASS oc);
 		static array<CK_BYTE, 256> Encrypt(const SecurityTokenKeyInfo& publicKey,CK_BYTE_PTR data, CK_ULONG dataLen);
         static array<CK_BYTE, 512> Decrypt(const SecurityTokenKeyInfo& privateKey,CK_BYTE_PTR data, CK_ULONG dataLen);
-        static SecurityCertificateInfo const GetCertificateInfo(CK_SLOT_ID slotId, CK_OBJECT_HANDLE object, CK_ATTRIBUTE_TYPE attributeType);
-        static vector <SecurityCertificateInfo> const GetAvailableCertificate();
 		
-		//TODO: find a way to make them protected again
-		static map <CK_SLOT_ID, Pkcs11Session> Sessions;
 		static void GetObjectAttribute(CK_SLOT_ID slotId, CK_OBJECT_HANDLE tokenObject, CK_ATTRIBUTE_TYPE attributeType, vector <byte>& attributeValue);
 		static list <CK_SLOT_ID> GetTokenSlots();
 
@@ -242,10 +237,10 @@ namespace VeraCrypt
 #else
 		static void* Pkcs11LibraryHandle;
 #endif
+		static map <CK_SLOT_ID, Pkcs11Session> Sessions;
 		static unique_ptr <SendExceptionFunctor> WarningCallback;
 
 		friend void SecurityTokenKeyfile::GetKeyfileData(vector <byte>& keyfileData) const;
-		friend class pkcs11Certificate;
 	};
 }
 

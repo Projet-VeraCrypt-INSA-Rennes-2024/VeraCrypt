@@ -34,8 +34,6 @@
 #include <fstream>
 #include <array>
 #include "Common/SecurityToken.h"
-#include "PKCS11/pkcs11Certificate.h"
-#include "PKCS11/pkcs11Rsa.h"
 
 namespace VeraCrypt
 {

@@ -2600,6 +2600,7 @@ SecurityTokenKeyfilesDialogBase::~SecurityTokenKeyfilesDialogBase()
 	DeleteButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SecurityTokenKeyfilesDialogBase::OnDeleteButtonClick ), NULL, this );
 	ImportButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SecurityTokenKeyfilesDialogBase::OnImportButtonClick ), NULL, this );
 	OKButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SecurityTokenKeyfilesDialogBase::OnOKButtonClick ), NULL, this );
+
 }
 
 VolumePropertiesDialogBase::VolumePropertiesDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
