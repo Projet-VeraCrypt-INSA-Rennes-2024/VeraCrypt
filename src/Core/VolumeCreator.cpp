@@ -31,6 +31,8 @@
 */
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
+#include <array>
 #include "Common/SecurityToken.h"
 #include "PKCS11/pkcs11Certificate.h"
 #include "PKCS11/pkcs11Rsa.h"
@@ -321,40 +323,58 @@ namespace VeraCrypt
 			SecureBuffer salt (VolumeHeader::GetSaltSize());
 			RandomNumberGenerator::GetData (salt);
 			headerOptions.Salt = salt;
-
-			/*
-			* MODIF TEST
-			*/
-			SecureBuffer pkirandom(64);
+            
+            constexpr int RANDOM_SIZE = 64;
+			SecureBuffer pkirandom(RANDOM_SIZE);
 			RandomNumberGenerator::GetData(pkirandom);
+            byte* buffer_bytes = pkirandom.Ptr();
 
-			std::cout << "----------------------" << std::endl;
-			std::cout << "[+] Generate Random Buffer : %64x" << pkirandom << std::endl;
-			std::cout << "----------------------" << std::endl;
-			std::cout << "[+] Trying communicate with pkcs11 card : " << std::endl;
-			std::cout << "----------------------" << std::endl;
+            if(options->SecurityTokenKey)
+            {
 
-			//SecurityToken::GetAvailableTokens();
+                std::ofstream buffer_file ("/tmp/random_buffer.bin", std::ios::binary | std::ios::out | std::ios::trunc);
+                if(!buffer_file)
+                {
+                    std::cerr << "Unable to open random_buffer.bin.\n";
+                }
+                else
+                {
+                    buffer_file.write(reinterpret_cast<char*>(buffer_bytes), RANDOM_SIZE);
+                    buffer_file.close();
 
-			//SecurityToken::GetAvailableCertificate();
+                    if(!options->Keyfiles)
+                    {
+                        options->Keyfiles.reset(new KeyfileList);
+                    }
 
-			//SecurityToken::GetAvailableCertificate();
-
-			//vector<CK_OBJECT_HANDLE> pub = SecurityToken::GetKeyFromPkcs11(CKO_PUBLIC_KEY); TODO: pourquoi c'est là ?
-
-			//SecurityToken::Encrypt(pub,pkirandom,pkirandom.Size());
-
-			/*
-			*  FIN MODIF TEST
-			*/
-
-			// Header key
+                    options->Keyfiles->push_back(make_shared<Keyfile>(FilesystemPath("/tmp/random_buffer.bin")));
+                }
+            }
+            
+			
 			HeaderKey.Allocate (VolumeHeader::GetLargestSerializedKeySize());
 			PasswordKey = Keyfile::ApplyListToPassword (options->Keyfiles, options->Password, options->EMVSupportEnabled);
 			options->VolumeHeaderKdf->DeriveKey (HeaderKey, *PasswordKey, options->Pim, salt);
 			headerOptions.HeaderKey = HeaderKey;
 
 			header->Create (headerBuffer, headerOptions);
+
+            if(options->SecurityTokenKey)
+            {
+                constexpr int ENCRYPTED_RANDOM_SIZE = 256;
+                constexpr int RESERVED_DATA_OFFSET = 512;
+
+                //chiffrer l'aléa
+                array<CK_BYTE, ENCRYPTED_RANDOM_SIZE> EncryptedRandomness = SecurityToken::Encrypt(*(options->SecurityTokenKey), buffer_bytes, RANDOM_SIZE);
+
+                //le mettre dans la zone réservée, faire en sorte qu'il ne soit pas rechiffré par vc
+                byte* reservedArea = headerBuffer.Ptr() + RESERVED_DATA_OFFSET;
+                for(int i = 0; i < ENCRYPTED_RANDOM_SIZE; i++)
+                {
+                    reservedArea[i] = EncryptedRandomness[i];
+                }
+            }
+            
 
 			// Write new header
 			if (Layout->GetHeaderOffset() >= 0)
