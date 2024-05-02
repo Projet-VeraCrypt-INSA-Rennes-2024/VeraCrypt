@@ -177,6 +177,8 @@ namespace VeraCrypt
 		Options.FilesystemOptions = FilesystemOptionsTextCtrl->GetValue();
 		Options.EMVSupportEnabled = Gui->GetPreferences().EMVSupportEnabled;
 
+        Options.SecurityTokenKey = PasswordPanel->GetSelectedSecurityTokenKey();
+
 		EndModal (wxID_OK);
 	}
 
