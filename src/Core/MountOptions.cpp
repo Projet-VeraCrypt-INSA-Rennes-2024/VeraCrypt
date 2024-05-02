@@ -52,6 +52,7 @@ namespace VeraCrypt
 		TC_CLONE (SharedAccessAllowed);
 		TC_CLONE (SlotNumber);
 		TC_CLONE (UseBackupHeaders);
+        TC_CLONE (SecurityTokenKey);
 	}
 
 	void MountOptions::Deserialize (shared_ptr <Stream> stream)
@@ -122,6 +123,7 @@ namespace VeraCrypt
 
 		sr.Deserialize ("Pim", Pim);
 		sr.Deserialize ("ProtectionPim", ProtectionPim);
+        SecurityTokenKey = (SecurityTokenKeyInfo*)sr.DeserializeUInt64("SecurityTokenKey");
 	}
 
 	void MountOptions::Serialize (shared_ptr <Stream> stream) const
@@ -174,7 +176,8 @@ namespace VeraCrypt
 
 		sr.Serialize ("Pim", Pim);
 		sr.Serialize ("ProtectionPim", ProtectionPim);
-	}
+        sr.Serialize ("SecurityTokenKey", (uint64)SecurityTokenKey);
+    }
 
 	TC_SERIALIZER_FACTORY_ADD_CLASS (MountOptions);
 }

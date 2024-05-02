@@ -13,6 +13,7 @@
 #ifndef TC_HEADER_Core_MountOptions
 #define TC_HEADER_Core_MountOptions
 
+#include "Common/SecurityToken.h"
 #include "Platform/Serializable.h"
 #include "Volume/Keyfile.h"
 #include "Volume/Volume.h"
@@ -37,7 +38,8 @@ namespace VeraCrypt
 			Removable (false),
 			SharedAccessAllowed (false),
 			SlotNumber (0),
-			UseBackupHeaders (false)
+			UseBackupHeaders (false),
+            SecurityTokenKey (nullptr)
 		{
 		}
 
@@ -72,6 +74,7 @@ namespace VeraCrypt
 		VolumeSlotNumber SlotNumber;
 		bool UseBackupHeaders;
 		bool EMVSupportEnabled;
+        SecurityTokenKeyInfo* SecurityTokenKey;
 
 	protected:
 		void CopyFrom (const MountOptions &other);
