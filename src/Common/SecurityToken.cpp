@@ -227,16 +227,6 @@ namespace VeraCrypt
 				throw;
 			}
 
-			foreach(const CK_OBJECT_HANDLE & dataHandle, GetObjects(slotId, CKO_CERTIFICATE)){
-				vector <byte> label;
-				GetObjectAttribute(slotId, dataHandle, CKA_SUBJECT, label);
-				std::cout << "ck :" << std::endl;
-				for(byte b: label){
-					std::cout << b;
-				}
-				std::cout << std::endl;
-			}
-
 			foreach(const CK_OBJECT_HANDLE & dataHandle, GetObjects(slotId, CKO_DATA))
 			{
 				SecurityTokenKeyfile keyfile;
@@ -382,12 +372,6 @@ namespace VeraCrypt
 	{
 		attributeValue.clear();
 
-		std::cout << "Affichage des sessions:\n";
-		for(const auto& pair: Sessions) {
-			std::cout << pair.first << "\n";
-		}
-		std::cout << "Fin de l'affichage des sessions:\n";
-
 		if (Sessions.find(slotId) == Sessions.end())
 			throw ParameterIncorrect(SRC_POS);
 
@@ -511,11 +495,11 @@ namespace VeraCrypt
 		return rep;
 	}
 
-	array<CK_BYTE, 512> SecurityToken::Encrypt(const SecurityTokenKeyInfo& publicKey, CK_BYTE_PTR data, CK_ULONG dataLen)
+	array<CK_BYTE, 256> SecurityToken::Encrypt(const SecurityTokenKeyInfo& publicKey, CK_BYTE_PTR data, CK_ULONG dataLen)
 	{
 		CK_RV status;
 		CK_SESSION_HANDLE session = Sessions[publicKey.slotId].Handle;
-		array<CK_BYTE, 512> encryptedData;
+		array<CK_BYTE, 256> encryptedData;
 
 		CK_ULONG encryptedDataLen;
 
@@ -527,10 +511,9 @@ namespace VeraCrypt
 		status = Pkcs11Functions->C_Encrypt(session, data, dataLen, encryptedData.data(), &encryptedDataLen);
 
 		if (status != CKR_OK)
+        {
 			throw Pkcs11Exception(status);
-		else {
-			std::cout << "Data successfully encrypted : " /*<< encryptedData*/ << std::endl;
-		}
+        }
 
 		return encryptedData;
 
@@ -552,9 +535,8 @@ namespace VeraCrypt
         status = Pkcs11Functions->C_Decrypt(session, data, dataLen, decryptedData.data(), &decryptedDataLen);
 
         if (status != CKR_OK)
+        {
             throw Pkcs11Exception(status);
-        else {
-            std::cout << "Data successfully decrypted : " /*<< decryptedData*/ << std::endl;
         }
 
 		return decryptedData;

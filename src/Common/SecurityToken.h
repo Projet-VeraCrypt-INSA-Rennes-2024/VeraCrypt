@@ -216,7 +216,7 @@ namespace VeraCrypt
 
 		//ADD
 		static vector<SecurityTokenKeyInfo> GetKeyFromPkcs11(CK_OBJECT_CLASS oc);
-		static array<CK_BYTE, 512> Encrypt(const SecurityTokenKeyInfo& publicKey,CK_BYTE_PTR data, CK_ULONG dataLen);
+		static array<CK_BYTE, 256> Encrypt(const SecurityTokenKeyInfo& publicKey,CK_BYTE_PTR data, CK_ULONG dataLen);
         static array<CK_BYTE, 512> Decrypt(const SecurityTokenKeyInfo& privateKey,CK_BYTE_PTR data, CK_ULONG dataLen);
         static SecurityCertificateInfo const GetCertificateInfo(CK_SLOT_ID slotId, CK_OBJECT_HANDLE object, CK_ATTRIBUTE_TYPE attributeType);
         static vector <SecurityCertificateInfo> const GetAvailableCertificate();
