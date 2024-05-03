@@ -74,7 +74,7 @@ namespace VeraCrypt
 		VolumeSlotNumber SlotNumber;
 		bool UseBackupHeaders;
 		bool EMVSupportEnabled;
-        SecurityTokenKeyInfo* SecurityTokenKey;
+        shared_ptr<SecurityTokenKeyInfo> SecurityTokenKey;
 
 	protected:
 		void CopyFrom (const MountOptions &other);

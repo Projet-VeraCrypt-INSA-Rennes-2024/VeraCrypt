@@ -123,7 +123,11 @@ namespace VeraCrypt
 
 		sr.Deserialize ("Pim", Pim);
 		sr.Deserialize ("ProtectionPim", ProtectionPim);
-        SecurityTokenKey = (SecurityTokenKeyInfo*)sr.DeserializeUInt64("SecurityTokenKey");
+        
+        if(!sr.DeserializeBool("SecurityTokenKeyNull"))
+            SecurityTokenKey = Serializable::DeserializeNew<SecurityTokenKeyInfo>(stream);
+        else
+            SecurityTokenKey = nullptr;
 	}
 
 	void MountOptions::Serialize (shared_ptr <Stream> stream) const
@@ -176,7 +180,10 @@ namespace VeraCrypt
 
 		sr.Serialize ("Pim", Pim);
 		sr.Serialize ("ProtectionPim", ProtectionPim);
-        sr.Serialize ("SecurityTokenKey", (uint64)SecurityTokenKey);
+
+        sr.Serialize("SecurityTokenKeyNull", SecurityTokenKey == nullptr);
+        if (SecurityTokenKey)
+            SecurityTokenKey->Serialize(stream);
     }
 
 	TC_SERIALIZER_FACTORY_ADD_CLASS (MountOptions);

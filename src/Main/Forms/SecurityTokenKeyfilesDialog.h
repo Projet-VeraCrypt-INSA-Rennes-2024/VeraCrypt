@@ -33,7 +33,7 @@ namespace VeraCrypt
 
 		SecurityTokenKeyfilesDialog (wxWindow* parent, bool selectionMode = true, KeyDisplay keyDisplayMode = KeyDisplay::None);
 		list <TokenKeyfilePath> GetSelectedSecurityTokenKeyfilePaths() const { return SelectedSecurityTokenKeyfilePaths; }
-        SecurityTokenKeyInfo* GetSelectedSecurityTokenKey() const { return selectedSecurityTokenKey; }
+        shared_ptr<SecurityTokenKeyInfo> GetSelectedSecurityTokenKey() const { return make_shared<SecurityTokenKeyInfo>(*selectedSecurityTokenKey); }
 
 	protected:
 		enum
@@ -63,7 +63,7 @@ namespace VeraCrypt
 		vector <shared_ptr<TokenKeyfile>> SecurityTokenKeyfileList;
 		vector <SecurityTokenKeyInfo> SecurityTokenCertificateList;
 		list <TokenKeyfilePath> SelectedSecurityTokenKeyfilePaths;
-        SecurityTokenKeyInfo *selectedSecurityTokenKey;
+        shared_ptr <SecurityTokenKeyInfo> selectedSecurityTokenKey;
         KeyDisplay keyDisplayMode;
 	};
 }

@@ -29,8 +29,6 @@
 /*
 *  USE FOR DEBUGGING 
 */
-#include <stdio.h>
-#include <iostream>
 #include <fstream>
 #include <array>
 #include "Common/SecurityToken.h"
@@ -333,7 +331,7 @@ namespace VeraCrypt
                 std::ofstream buffer_file ("/tmp/random_buffer.bin", std::ios::binary | std::ios::out | std::ios::trunc);
                 if(!buffer_file)
                 {
-                    std::cerr << "Unable to open random_buffer.bin.\n";
+                    throw AssertionFailed("Error while trying to create a volume: Unable to open random_buffer.bin.");
                 }
                 else
                 {

@@ -185,11 +185,32 @@ namespace VeraCrypt
 		string label;
 	};
 
-	struct SecurityTokenKeyInfo
+    enum KeyType
+    {
+        Public, Private
+    };
+
+	struct SecurityTokenKeyInfo : public Serializable
 	{
-		CK_OBJECT_HANDLE handle;
-		CK_SLOT_ID slotId;
+        SecurityTokenKeyInfo() = default;
+        
+        SecurityTokenKeyInfo(CK_OBJECT_HANDLE handle, CK_SLOT_ID slotId, string label, KeyType keyType):
+            handle(handle),
+            slotId(slotId),
+            label(label),
+            keyType(keyType)
+        {}
+        
+        SecurityTokenKeyInfo(const SecurityTokenKeyInfo&) = default;
+        virtual ~SecurityTokenKeyInfo() = default;
+        SecurityTokenKeyInfo& operator=(const SecurityTokenKeyInfo&) = default;
+
+        TC_SERIALIZABLE(SecurityTokenKeyInfo);
+
+		CK_OBJECT_HANDLE handle; //unsigned long int
+		CK_SLOT_ID slotId; //unsigned long int
 		string label;
+        KeyType keyType;
 	};
 
 	#endif
@@ -216,8 +237,9 @@ namespace VeraCrypt
 
 		static vector<SecurityTokenKeyInfo> GetKeyFromPkcs11(CK_OBJECT_CLASS oc);
 		static array<CK_BYTE, 256> Encrypt(const SecurityTokenKeyInfo& publicKey,CK_BYTE_PTR data, CK_ULONG dataLen);
-        static array<CK_BYTE, 512> Decrypt(const SecurityTokenKeyInfo& privateKey,CK_BYTE_PTR data, CK_ULONG dataLen);
-		
+        static array<CK_BYTE, 64> Decrypt(const SecurityTokenKeyInfo& privateKey,CK_BYTE_PTR data, CK_ULONG dataLen);
+        static void ReInitLibrary(const string& pkcs11LibraryPath);
+
 		static void GetObjectAttribute(CK_SLOT_ID slotId, CK_OBJECT_HANDLE tokenObject, CK_ATTRIBUTE_TYPE attributeType, vector <byte>& attributeValue);
 		static list <CK_SLOT_ID> GetTokenSlots();
 

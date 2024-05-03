@@ -89,7 +89,7 @@ namespace VeraCrypt
 		uint32 SectorSize;
 		shared_ptr <Hash> SelectedHash;
 		uint64 VolumeSize;
-        SecurityTokenKeyInfo* SecurityTokenKey;
+        shared_ptr<SecurityTokenKeyInfo> SecurityTokenKey;
 
 	private:
 		void UpdateControls ();

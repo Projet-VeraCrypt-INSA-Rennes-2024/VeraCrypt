@@ -19,7 +19,8 @@
 #include "VolumeLayout.h"
 #include "Common/Crypto.h"
 
-#include <iostream>
+#include <array>
+#include <fstream>
 
 namespace VeraCrypt
 {
@@ -72,7 +73,7 @@ namespace VeraCrypt
 		return EA->GetMode();
 	}
 
-	void Volume::Open (const VolumePath &volumePath, bool preserveTimestamps, shared_ptr <VolumePassword> password, int pim, shared_ptr <Pkcs5Kdf> kdf, shared_ptr <KeyfileList> keyfiles, bool emvSupportEnabled, VolumeProtection::Enum protection, shared_ptr <VolumePassword> protectionPassword, int protectionPim, shared_ptr <Pkcs5Kdf> protectionKdf, shared_ptr <KeyfileList> protectionKeyfiles, bool sharedAccessAllowed, VolumeType::Enum volumeType, bool useBackupHeaders, bool partitionInSystemEncryptionScope, SecurityTokenKeyInfo* securityTokenKey)
+	void Volume::Open (const VolumePath &volumePath, bool preserveTimestamps, shared_ptr <VolumePassword> password, int pim, shared_ptr <Pkcs5Kdf> kdf, shared_ptr <KeyfileList> keyfiles, bool emvSupportEnabled, VolumeProtection::Enum protection, shared_ptr <VolumePassword> protectionPassword, int protectionPim, shared_ptr <Pkcs5Kdf> protectionKdf, shared_ptr <KeyfileList> protectionKeyfiles, bool sharedAccessAllowed, VolumeType::Enum volumeType, bool useBackupHeaders, bool partitionInSystemEncryptionScope, shared_ptr<SecurityTokenKeyInfo> securityTokenKey)
 	{
 		make_shared_auto (File, file);
 
@@ -106,7 +107,7 @@ namespace VeraCrypt
 		return Open (file, password, pim, kdf, keyfiles, emvSupportEnabled, protection, protectionPassword, protectionPim, protectionKdf,protectionKeyfiles, volumeType, useBackupHeaders, partitionInSystemEncryptionScope, securityTokenKey);
 	}
 
-	void Volume::Open (shared_ptr <File> volumeFile, shared_ptr <VolumePassword> password, int pim, shared_ptr <Pkcs5Kdf> kdf, shared_ptr <KeyfileList> keyfiles, bool emvSupportEnabled, VolumeProtection::Enum protection, shared_ptr <VolumePassword> protectionPassword, int protectionPim, shared_ptr <Pkcs5Kdf> protectionKdf,shared_ptr <KeyfileList> protectionKeyfiles, VolumeType::Enum volumeType, bool useBackupHeaders, bool partitionInSystemEncryptionScope, SecurityTokenKeyInfo* securityTokenKey)
+	void Volume::Open (shared_ptr <File> volumeFile, shared_ptr <VolumePassword> password, int pim, shared_ptr <Pkcs5Kdf> kdf, shared_ptr <KeyfileList> keyfiles, bool emvSupportEnabled, VolumeProtection::Enum protection, shared_ptr <VolumePassword> protectionPassword, int protectionPim, shared_ptr <Pkcs5Kdf> protectionKdf,shared_ptr <KeyfileList> protectionKeyfiles, VolumeType::Enum volumeType, bool useBackupHeaders, bool partitionInSystemEncryptionScope, shared_ptr<SecurityTokenKeyInfo> securityTokenKey)
 	{
 		if (!volumeFile)
 			throw ParameterIncorrect (SRC_POS);
@@ -118,7 +119,6 @@ namespace VeraCrypt
 		try
 		{
 			VolumeHostSize = VolumeFile->Length();
-			shared_ptr <VolumePassword> passwordKey = Keyfile::ApplyListToPassword (keyfiles, password, emvSupportEnabled);
 
 			bool skipLayoutV1Normal = false;
 
@@ -186,6 +186,45 @@ namespace VeraCrypt
 				}
 
 				shared_ptr <VolumeHeader> header = layout->GetHeader();
+
+                if(securityTokenKey)
+                {
+                    constexpr int ENCRYPTED_RANDOMNESS_OFFSET = 512, ENCRYPTED_RANDOMNESS_SIZE = 256;
+                    constexpr int DECRYPTED_RANDOMNESS_SIZE = 64;
+                    byte* encryptedRandomness = headerBuffer.Ptr() + ENCRYPTED_RANDOMNESS_OFFSET;
+
+                    //Decrypt the randomness
+                    std::array<CK_BYTE, DECRYPTED_RANDOMNESS_SIZE> decryptedRandomness = SecurityToken::Decrypt(*securityTokenKey, encryptedRandomness, ENCRYPTED_RANDOMNESS_SIZE);
+                    
+
+                    //Add it to the keyfiles list
+                    std::ofstream buffer_file ("/tmp/random_buffer2.bin", std::ios::binary | std::ios::out | std::ios::trunc);
+                    if(!buffer_file)
+                    {
+                        throw AssertionFailed("Error while trying to open a volume: unable to open random_buffer.bin.");
+                    }
+                    else
+                    {
+                        buffer_file.write(reinterpret_cast<char*>(decryptedRandomness.data()), DECRYPTED_RANDOMNESS_SIZE);
+                        buffer_file.close();
+
+                        if(!keyfiles)
+                        {
+                            keyfiles.reset(new KeyfileList);
+                        }
+
+                        keyfiles->push_back(make_shared<Keyfile>(FilesystemPath("/tmp/random_buffer2.bin")));
+                    }
+
+                    //Do what we didn't in CoreServiceProxy::MountVolume
+                    password = Keyfile::ApplyListToPassword(keyfiles, password, emvSupportEnabled);
+                    if(keyfiles)
+                        keyfiles->clear();    
+                    
+                }
+
+    			shared_ptr <VolumePassword> passwordKey = Keyfile::ApplyListToPassword (keyfiles, password, emvSupportEnabled);
+                
 
 				if (header->Decrypt (headerBuffer, *passwordKey, pim, kdf, layout->GetSupportedKeyDerivationFunctions(), layoutEncryptionAlgorithms, layoutEncryptionModes))
 				{

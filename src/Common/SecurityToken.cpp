@@ -425,18 +425,41 @@ namespace VeraCrypt
 		return slots;
 	}
 
+    void SecurityTokenKeyInfo::Serialize (shared_ptr<Stream> stream) const 
+    {
+        Serializable::Serialize (stream);
+        Serializer sr (stream);
+
+        sr.Serialize("handle", handle);
+        sr.Serialize("slotId", slotId);
+        sr.Serialize("label", label);
+        sr.Serialize("keyType", keyType);
+    }
+
+    void SecurityTokenKeyInfo::Deserialize (shared_ptr<Stream> stream)
+    {
+        Serializer sr (stream);
+
+        sr.Deserialize("handle", handle);
+        sr.Deserialize("slotId", slotId);
+        sr.Deserialize("label", label);
+
+        int keyTypeUnderlying;
+        sr.Deserialize("keyType", keyTypeUnderlying);
+        keyType = static_cast<KeyType>(keyTypeUnderlying);
+    }
+
+    TC_SERIALIZER_FACTORY_ADD_CLASS (SecurityTokenKeyInfo);
+
 	vector<SecurityTokenKeyInfo> SecurityToken::GetKeyFromPkcs11(CK_OBJECT_CLASS oc)
 	{
 		vector <SecurityTokenKeyInfo> rep;
 
 		foreach(const CK_SLOT_ID & slotId, GetTokenSlots())
 		{
-			SecurityTokenInfo token;
-
 			try
 			{
 				LoginUserIfRequired(slotId);
-				token = GetTokenInfo(slotId);
 			}
 			catch (UserAbort&)
 			{
@@ -457,7 +480,7 @@ namespace VeraCrypt
 				GetObjectAttribute(slotId, dataHandle, CKA_LABEL, labelAsBytes);
 	            string labelAsText = string(reinterpret_cast<const char*>(labelAsBytes.data()), labelAsBytes.size());
 				
-				rep.push_back({dataHandle, slotId, labelAsText});
+				rep.push_back({dataHandle, slotId, labelAsText, oc == CKO_PUBLIC_KEY ? Public : Private});
 			}
 		}
 
@@ -488,19 +511,65 @@ namespace VeraCrypt
 
 	}
 
-    array<CK_BYTE, 512> SecurityToken::Decrypt(const SecurityTokenKeyInfo& privateKey, CK_BYTE_PTR data, CK_ULONG dataLen)
-    {
-        CK_RV status;
-        CK_SESSION_HANDLE session = Sessions[privateKey.slotId].Handle;
-        array<CK_BYTE, 512> decryptedData;
+    void SecurityToken::ReInitLibrary(const string& pkcs11LibraryPath)
+	{
+		Pkcs11LibraryHandle = dlopen(pkcs11LibraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+		throw_sys_sub_if(!Pkcs11LibraryHandle, dlerror());
 
-        CK_ULONG decryptedDataLen;
+		typedef CK_RV(*C_GetFunctionList_t) (CK_FUNCTION_LIST_PTR_PTR ppFunctionList);
+		C_GetFunctionList_t C_GetFunctionList = (C_GetFunctionList_t)dlsym(Pkcs11LibraryHandle, "C_GetFunctionList");
+
+		if (!C_GetFunctionList)
+			throw SecurityTokenLibraryNotInitialized();
+
+		CK_RV status = C_GetFunctionList(&Pkcs11Functions);
+		if (status != CKR_OK)
+			throw Pkcs11Exception(status);
+
+		status = Pkcs11Functions->C_Initialize(NULL_PTR);
+		if (status != CKR_OK)
+			throw Pkcs11Exception(status);
+
+		Initialized = true;
+	}
+
+    array<CK_BYTE, 64> SecurityToken::Decrypt(const SecurityTokenKeyInfo& privateKey, CK_BYTE_PTR data, CK_ULONG dataLen)
+    {        
+        ReInitLibrary("/usr/lib/pkcs11/libeToken.so");
+        Login(privateKey.slotId, "0000");
+
+        CK_OBJECT_HANDLE newHandle;
+
+        foreach(const CK_OBJECT_HANDLE& dataHandle, GetObjects(privateKey.slotId, CKO_PRIVATE_KEY))
+        {
+			vector<byte> labelAsBytes;
+			GetObjectAttribute(privateKey.slotId, dataHandle, CKA_LABEL, labelAsBytes);
+	        string labelAsText = string(reinterpret_cast<const char*>(labelAsBytes.data()), labelAsBytes.size());
+				
+			if(labelAsText == privateKey.label)
+            {
+                newHandle = dataHandle;
+                break;
+            }
+        }
+
+        CK_RV status;
+
+        CK_SESSION_HANDLE session = Sessions[privateKey.slotId].Handle;
+        array<CK_BYTE, 64> decryptedData;
+
+        CK_ULONG decryptedDataLen = 64;
 
         CK_RSA_PKCS_OAEP_PARAMS oaepParams = {CKM_SHA_1, CKG_MGF1_SHA1, CKZ_DATA_SPECIFIED, NULL_PTR, 0};
 
         CK_MECHANISM mechanism = {CKM_RSA_PKCS_OAEP, &oaepParams, sizeof(oaepParams)};
 
-        status = Pkcs11Functions->C_DecryptInit(session,&mechanism,privateKey.handle);
+        status = Pkcs11Functions->C_DecryptInit(session,&mechanism,newHandle);
+        if (status != CKR_OK)
+        {
+            throw Pkcs11Exception(status);
+        }
+        
         status = Pkcs11Functions->C_Decrypt(session, data, dataLen, decryptedData.data(), &decryptedDataLen);
 
         if (status != CKR_OK)

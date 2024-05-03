@@ -89,7 +89,7 @@ namespace VeraCrypt
 		const auto objectType = keyDisplayMode == KeyDisplay::PrivateKeysOnly ? CKO_PRIVATE_KEY : CKO_PUBLIC_KEY;
         SecurityTokenCertificateList = SecurityToken::GetKeyFromPkcs11(objectType);
 
-        for(int i = 0; i < SecurityTokenCertificateList.size(); i++)
+        for(auto i = 0; i < SecurityTokenCertificateList.size(); i++)
 		{
 			const SecurityTokenKeyInfo& keyInfo = SecurityTokenCertificateList[i];
 
@@ -257,7 +257,7 @@ namespace VeraCrypt
         }
 
         int itemData = (int)SecurityTokenCertificateListCtrl->GetItemData(selectedItemId);
-        selectedSecurityTokenKey = new SecurityTokenKeyInfo(SecurityTokenCertificateList[itemData]);
+        selectedSecurityTokenKey = make_shared<SecurityTokenKeyInfo>(SecurityTokenCertificateList[itemData]);
 
 		EndModal (wxID_OK);
 	}

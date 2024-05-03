@@ -98,9 +98,13 @@ namespace VeraCrypt
 			{
 				MountOptions newOptions = options;
 
-				newOptions.Password = Keyfile::ApplyListToPassword (options.Keyfiles, options.Password, options.EMVSupportEnabled);
-				if (newOptions.Keyfiles)
-					newOptions.Keyfiles->clear();
+                //This will be done after we retrieve the stored randomness
+                if(!newOptions.SecurityTokenKey)
+                {
+                    newOptions.Password = Keyfile::ApplyListToPassword (options.Keyfiles, options.Password, options.EMVSupportEnabled);
+				    if (newOptions.Keyfiles)
+					    newOptions.Keyfiles->clear();
+                }
 
 				newOptions.ProtectionPassword = Keyfile::ApplyListToPassword (options.ProtectionKeyfiles, options.ProtectionPassword, options.EMVSupportEnabled);
 				if (newOptions.ProtectionKeyfiles)
